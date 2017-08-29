@@ -1,0 +1,27 @@
+<!doctype html>
+<html ng-app='lifeApp'>
+	<head>
+		<meta charset='utf-8'>
+		<title>Life</title>
+	</head>
+	<body>
+		<div ng-controller='lifeController'>
+			<canvas id='lifeField' width='1000px' height='1000px' style='border: 1px solid'></canvas>		
+			<input id='startButton' style='width: 100px' type='button' value='Start'></input>
+			<input id='stopButton' style='width: 100px' type='button' value='Stop'></input>
+			<span id='coords'></span>
+			<span id='cellNumbers'></span>	
+
+			<input type="text" ng-disabled='gameIsRunning' ng-model='speed' name="speed"> <span>Скорость: {{speed}}</span>
+			<input type="text" ng-disabled='gameIsRunning' ng-model='rowSize' name="rowSize"> <span>Размер клетки по Y: {{rowSize}}</span>
+			<input type="text" ng-disabled='gameIsRunning' ng-model='columnSize' name="columnSize"> <span>Размер клетки по X: {{columnSize}}</span>
+			<input type="text" ng-disabled='gameIsRunning' ng-model='circleBorders' name="circleBorders"> <span>Цикличность: {{circleBorders}}</span>
+
+			<script type='text/javascript' src='../app/js/lib/angular.js'></script>
+			<script type='text/javascript' src='../app/js/app.js'></script>
+			<script type='text/javascript' src='../app/js/controllers/lifeController.js'></script>
+
+		</div>	
+	</body>
+</html>
+
