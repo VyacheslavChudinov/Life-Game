@@ -3,23 +3,50 @@
 	<head>
 		<meta charset='utf-8'>
 		<title>Life</title>
+
+		<link rel="stylesheet" type="text/css" href="../Internal Project/css/styles.css">
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
 	</head>
 	<body>
 		<div ng-controller='lifeController'>
-			<canvas id='lifeField' width='1000px' height='1000px' style='border: 1px solid'></canvas>		
-			<input id='startButton' style='width: 100px' type='button' value='Start'></input>
-			<input id='stopButton' style='width: 100px' type='button' value='Stop'></input>
-			<span id='coords'></span>
-			<span id='cellNumbers'></span>	
 
-			<input type="text" ng-disabled='gameIsRunning' ng-model='speed' name="speed"> <span>Скорость: {{speed}}</span>
-			<input type="text" ng-disabled='gameIsRunning' ng-model='rowSize' name="rowSize"> <span>Размер клетки по Y: {{rowSize}}</span>
-			<input type="text" ng-disabled='gameIsRunning' ng-model='columnSize' name="columnSize"> <span>Размер клетки по X: {{columnSize}}</span>
-			<input type="text" ng-disabled='gameIsRunning' ng-model='circleBorders' name="circleBorders"> <span>Цикличность: {{circleBorders}}</span>
+		<div class="d-flex justify-content-between">
+    		<div>
+    			<canvas id='lifeField' width='800px' height='800px' style='border: 1px solid; float: left;'></canvas>	</div>
+			</div>
 
-			<script type='text/javascript' src='../app/js/lib/angular.js'></script>
-			<script type='text/javascript' src='../app/js/app.js'></script>
-			<script type='text/javascript' src='../app/js/controllers/lifeController.js'></script>
+			<div align="center">
+				<input id='startButton' type='button' class="btn btn-default" value='Start'></input>
+				<input id='stopButton'  type='button' class="btn btn-default" value='Stop'></input>
+				<input id='saveButton'  type='button' class="btn btn-default" ng-click="downloadMatrix(getMapJSON(), 'Matrix.txt', 'text/plain')" value='Save'></input>	
+				<hr><!--
+				<span>Скорость:</span> <input  type="text" ng-model='speed' name="speed"> 
+				<hr>!-->
+				<div class="custom-checkbox">
+				    <input type="checkbox" ng-model='circleBorders' id='cb1' checked="">
+				    <label for="cb1">Borderless</label>
+				</div>
+				<hr>
+				<input id="fileinput" type="file" value='Open' />	
+
+				
+
+				
+			</div>
+
+			<!--
+			<input type="text" ng-model='rowSize' ng-hide='gameIsRunning'  name="rowSize"> <span>Размер клетки по Y: {{rowSize}}</span>
+			<input type="text" ng-model='columnSize' ng-hide='gameIsRunning'  name="columnSize"> <span>Размер клетки по X: {{columnSize}}</span>
+			<input type="text" ng-model='circleBorders' ng-hide='gameIsRunning'  name="circleBorders"> <span>Цикличность: {{circleBorders}}</span>
+
+
+
+			!-->
+			
+			<script type='text/javascript' src='../Internal Project/js/lib/angular.js'></script>
+			<script type='text/javascript' src='../Internal Project/js/lib/ng-fileDialog.js'></script>
+			<script type='text/javascript' src='../Internal Project/js/app.js'></script>
+			<script type='text/javascript' src='../Internal Project/js/controllers/lifeController.js'></script>
 
 		</div>	
 	</body>

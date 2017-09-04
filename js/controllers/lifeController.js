@@ -1,8 +1,10 @@
 (function(){
 	'use strict';
 
-	var lifeApp = angular.module('lifeApp', []);
-	    lifeApp.controller('lifeController', function ($scope) {
+	var lifeApp = angular.module('lifeApp', ['ng-fileDialog']);
+
+	    lifeApp.controller('lifeController', function ($scope, FileDialog) {		
+
 	    $scope.gameIsRunning = false;
 
 	    $scope.fieldWidth = 1000;
@@ -10,9 +12,35 @@
 	    $scope.speed = 200;
 		$scope.columnSize =  20,
 		$scope.rowSize = 20,
-		$scope.circleBorders =  true,
+		$scope.circleBorders = true,
 		$scope.targetColor = '#aaa',
 	 	$scope.selectedColor =  '#333';
+
+	 	$scope.map = [];
+
+	 	function readSingleFile(evt) {
+		    var f = evt.target.files[0]; 
+
+		    if (f) {
+	        	var r = new FileReader();
+	        	r.onload = function(e) { 
+			  		var contents = e.target.result;
+			  		$scope.map = JSON.parse(contents);	
+			  		life.redrawMap();		      		        
+		      	}
+		      	r.readAsText(f);
+		    } else { 
+		    	alert("Failed to load file");
+		    }
+	  	}
+
+	  document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+
+
+	    $scope.getMapJSON = function(){
+	    	return JSON.stringify($scope.map);
+	    }
+
 
 	    var life = new LifeGame(
 			document.getElementById('lifeField'),
@@ -22,10 +50,19 @@
 	    	columnSize: $scope.columnSize,
 	    	rowSize: $scope.rowSize,
 	    	speed: $scope.speed,
-	    	circleBorders: $scope.circleBorders,
 	    	targetColor: $scope.targetColor,
 	    	selectedColor: $scope.selectedColor
 	    });
+
+	 	$scope.clearMap = life.clearMap;
+
+	    $scope.downloadMatrix = function downloadMatrix(text, name, type) {
+		    var a = document.createElement("a");
+		    var file = new Blob([text], {type: type});
+		    a.href = URL.createObjectURL(file);
+		    a.download = name;
+		    a.click();
+		}	
 	    
 	    function LifeGame(field, start, stop, options) {
 			var width = field.width,
@@ -33,8 +70,7 @@
 				previousColumn = 0,
 				previousRow= 0,
 				currentColumn = 0,
-				currentRow= 0,
-				map,
+				currentRow= 0,				
 				processId,
 				states = {empty : 0, present : 1, dead : 2, born : 3},
 				borders,
@@ -44,7 +80,6 @@
 				columnSize = options.columnSize || 20,
 				rowSize = options.rowSize || 20,
 				speed = options.speed || 50,
-				circleBorders = options.circleBorders || false,
 				targetColor = options.targetColor || '#aaa',
 			 	selectedColor = options.selectedColor || '#333';
 
@@ -55,15 +90,15 @@
 					middleRow;
 				columnCount = Math.ceil(width / columnSize);
 				rowCount = Math.ceil(height / rowSize);
-				map = new Array(rowCount);
+				$scope.map = new Array(rowCount);
 
 				for (i = columnCount; i--;){
-					map[i] = new Array(columnCount);
+					$scope.map[i] = new Array(columnCount);
 				};
 
 				for (i = rowCount; i--;){
 					for (j = columnCount; j--;){
-							map[i][j] = states.empty;
+							$scope.map[i][j] = states.empty;
 					}	
 				}
 
@@ -76,6 +111,28 @@
 					right : columnCount - 1,
 					bottom : rowCount - 1
 				};
+			}
+
+			this.redrawMap = function redrawMap(){
+				for (var i = borders.top; i <= borders.bottom; i++){
+					for (var j = borders.left; j <= borders.right; j++){
+						if(isBorn(i, j) || isPresent(i, j)){							
+							fillCell(context, i + 1, j + 1, selectedColor);
+						} else {
+							clearCell(i + 1, j + 1);
+						}
+					}
+				}	
+			}
+
+			this.clearMap = function clearMap(){
+
+				for (var i = borders.top; i <= borders.bottom; i++){
+					for (var j = borders.left; j <= borders.right; j++){
+						$scope.map[i, j] = states.empty;
+						clearCell(i + 1, j + 1);
+					}
+				}	
 			}
 
 			function getColumIndex(x){
@@ -151,55 +208,55 @@
 				if (i === undefined || j === undefined){
 					return true;
 				}
-				return map[i][j] === states.empty;
+				return $scope.map[i][j] === states.empty;
 			}
 
 			function isPresent(i, j){
 				if (i === undefined || j === undefined){
 					return false;
 				}
-				return map[i][j] === states.present;
+				return $scope.map[i][j] === states.present;
 			}
 			
 			function isBorn(i, j){
 				if (i === undefined || j === undefined){
 					return false;
 				}
-				return map[i][j] === states.born;
+				return $scope.map[i][j] === states.born;
 			}
 			
 			function isDead(i, j){
 				if (i === undefined || j === undefined){
 					return false;
 				}
-				return map[i][j] === states.dead;
+				return $scope.map[i][j] === states.dead;
 			}
 
 			function getCorrectedBorders(borders){
 				if (borders.top <= 0){
 					borders.top = 0;
-					if (circleBorders){
+					if ($scope.circleBorders){
 						borders.bottom = rowCount - 1;
 					}
 				}
 
 				if (borders.bottom >= rowCount - 1){
 					borders.bottom = rowCount - 1;
-					if (circleBorders){
+					if ($scope.circleBorders){
 						borders.top = 0;
 					}
 				}
 				
 				if (borders.right >= columnCount - 1){
 					borders.right = columnCount - 1;
-					if (circleBorders){
+					if ($scope.circleBorders){
 						borders.left = 0;
 					}
 				}
 
 				if (borders.left <= 0){
 					borders.left = 0;
-					if (circleBorders){
+					if ($scope.circleBorders){
 						borders.right = columnCount - 1;
 					}
 				}
@@ -295,18 +352,18 @@
 			}		
 
 			function isSelectedCell(currentRow, currentColumn){
-				return map[currentRow - 1][currentColumn - 1] === states.present;
+				return $scope.map[currentRow - 1][currentColumn - 1] === states.present;
 			}
 
 			function selectCell(){
 				var i = currentRow - 1,
 				j = currentColumn - 1,
-				currentState = map[i][j];
+				currentState = $scope.map[i][j];
 
 				if (currentState === states.present){
-					map[i][j] = states.empty;					
+					$scope.map[i][j] = states.empty;					
 				} else {
-					map[i][j] = states.present;					
+					$scope.map[i][j] = states.present;					
 				}
 
 				//borders = getCellsBorders(0, 0, columnCount - 1, rowCount - 1);		
@@ -324,10 +381,10 @@
 				for (var i = borders.top; i < borders.bottom + 1; i++){
 					for (var j = borders.left; j < borders.right + 1; j++){
 						if ((isAlone(i,j) || isOvercrowded(i, j)) && isPresent(i, j)){
-							map[i][j] = states.dead;	
+							$scope.map[i][j] = states.dead;	
 							fillCell(context, i + 1, j + 1, '#f00');		;
 						} else if (thereIsOnlyThreeNeighbors(i, j) && isEmpty(i, j)){
-							map[i][j] = states.born;					
+							$scope.map[i][j] = states.born;					
 							fillCell(context, i + 1, j + 1, '#0f0');	
 						}				
 					}
@@ -340,10 +397,10 @@
 					for (var i = borders.top; i <= borders.bottom; i++){
 						for (var j = borders.left; j <= borders.right; j++){
 							if(isBorn(i, j) || isPresent(i, j)){
-								map[i][j] = states.present;
+								$scope.map[i][j] = states.present;
 								fillCell(context, i + 1, j + 1, selectedColor);
 							} else {
-								map[i][j] = states.empty;
+								$scope.map[i][j] = states.empty;
 								clearCell(i + 1, j + 1);
 							}
 						}
@@ -430,18 +487,18 @@
 
 				function xClosure(x){		
 					if (x < 0){
-						return circleBorders ? columnCount - 1 : undefined;
+						return $scope.circleBorders ? columnCount - 1 : undefined;
 					} else if (x > (columnCount - 1)){
-						return circleBorders ? 0 : undefined;
+						return $scope.circleBorders ? 0 : undefined;
 					}
 					return x;
 				}
 
 				function yClosure(y){
 					if (y < 0){
-						return circleBorders ? rowCount - 1 : undefined;
+						return $scope.circleBorders ? rowCount - 1 : undefined;
 					} else if (y > (rowCount - 1)){
-						return circleBorders ? 0 : undefined;
+						return $scope.circleBorders ? 0 : undefined;
 					}
 					return y;
 				}
@@ -451,16 +508,12 @@
 			field.onmousemove = targetCell;
 			field.onclick = selectCell;
 			start.onclick = (function(){
-				$scope.gameIsRunning = true;
-
 				if (processId === undefined){
 					processId = setInterval(step, $scope.speed);
 				}				
 			});
 
 			stop.onclick =  (function(){
-				$scope.gameIsRunning = false;	
-
 				clearInterval(processId);
 				processId = undefined;	
 				

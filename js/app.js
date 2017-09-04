@@ -1,6 +1,6 @@
 (function(){
 	'use strict';
 
-	angular.module('lifeApp', []);	  
+	angular.module('lifeApp', ['ng-fileDialog']);	  
 	  
 })();
