@@ -9,16 +9,18 @@
 
 	    $scope.fieldWidth = 1000;
 	    $scope.fieldHeight = 1000;
-	    $scope.speed = 200;
+	    $scope.speed = 2000;
 		$scope.columnSize =  20,
 		$scope.rowSize = 20,
 		$scope.circleBorders = true,
 		$scope.targetColor = '#aaa',
 	 	$scope.selectedColor =  '#333';
+	 	$scope.matrixSize = 45;
 
 	 	$scope.map = [];
 
 	 	function readSingleFile(evt) {
+
 		    var f = evt.target.files[0]; 
 
 		    if (f) {
@@ -32,9 +34,11 @@
 		    } else { 
 		    	alert("Failed to load file");
 		    }
+
+		    document.getElementById('fileInput').value = null;
 	  	}
 
-	  document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+	  	document.getElementById('fileInput').addEventListener('change', readSingleFile, false);
 
 
 	    $scope.getMapJSON = function(){
@@ -55,6 +59,7 @@
 	    });
 
 	 	$scope.clearMap = life.clearMap;
+	 	$scope.changeSpeed = life.changeSpeed;
 
 	    $scope.downloadMatrix = function downloadMatrix(text, name, type) {
 		    var a = document.createElement("a");
@@ -85,9 +90,7 @@
 
 			function createMap(){
 				var i = 0, 
-					j = 0,
-					middleColumn,
-					middleRow;
+					j = 0;
 				columnCount = Math.ceil(width / columnSize);
 				rowCount = Math.ceil(height / rowSize);
 				$scope.map = new Array(rowCount);
@@ -102,9 +105,6 @@
 					}	
 				}
 
-				middleColumn = Math.round(columnCount / 2) - 1;
-				middleRow = Math.round(rowCount / 2) - 1;
-
 				borders = {
 					top : 0,
 					left : 0,
@@ -113,7 +113,8 @@
 				};
 			}
 
-			this.redrawMap = function redrawMap(){
+			this.redrawMap = function redrawMap(){				
+
 				for (var i = borders.top; i <= borders.bottom; i++){
 					for (var j = borders.left; j <= borders.right; j++){
 						if(isBorn(i, j) || isPresent(i, j)){							
@@ -127,12 +128,21 @@
 
 			this.clearMap = function clearMap(){
 
-				for (var i = borders.top; i <= borders.bottom; i++){
-					for (var j = borders.left; j <= borders.right; j++){
-						$scope.map[i, j] = states.empty;
+				for (var i = 0; i < rowCount; i++){
+					for (var j = 0; j < columnCount; j++){
 						clearCell(i + 1, j + 1);
 					}
 				}	
+
+				createMap();				
+			}
+
+			this.changeSpeed = function changeSpeed(newSpeed){
+				$scope.speed = newSpeed;
+
+				clearInterval(processId);
+				processId = setInterval(step, $scope.speed);
+
 			}
 
 			function getColumIndex(x){
@@ -298,7 +308,7 @@
 				result.right = getRightBorder() + 1;
 				result.bottom = getBottomBorder() + 1;		
 
-				//borders = getCorrectedBorders(result);	
+				borders = getCorrectedBorders(result);	
 
 				return result;
 			
@@ -366,7 +376,7 @@
 					$scope.map[i][j] = states.present;					
 				}
 
-				//borders = getCellsBorders(0, 0, columnCount - 1, rowCount - 1);		
+				borders = getCellsBorders(0, 0, columnCount - 1, rowCount - 1);		
 				
 				fillCell(context, currentRow, currentColumn, selectedColor);	
 				previousColumn = 0;
