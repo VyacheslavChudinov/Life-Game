@@ -21,30 +21,31 @@
 				<input id='saveButton'  type='button' class="btn btn-default" ng-click="downloadMatrix(getMapJSON(), 'Matrix.txt', 'text/plain')" value='Save'></input>	
 				<input id='clearButton'  type='button' class="btn btn-default" ng-click="clearMap()" value='Clear'></input>
 				<hr>
-					<div class="custom-checkbox">
-					    <input type="checkbox" ng-model='circleBorders' id='cb1' checked="">
-					    <label for="cb1">Borderless</label>
-					</div>
-
-					<label>
+				<div class="custom-checkbox">
+				    <input type="checkbox" ng-model='circleBorders' id='cb1' checked="">
+				    <label for="cb1">Borderless</label>
+				</div>
+				<hr>
+				<div >
+					<label  class="btn btn-default radio-button">
 						<input type="radio" ng-model="speed" ng-change="changeSpeed(speed)" ng-value="2000">
 						Super Slow
 					</label>
-					<label>
+					<label class="btn btn-default radio-button">
 						<input type="radio" ng-model="speed" ng-change="changeSpeed(speed)" ng-value="1000">
 						Slow
 					</label>
-					<label>
+					<label class="btn btn-default radio-button">
 						<input type="radio"  ng-model="speed" ng-change="changeSpeed(speed)" ng-value="200">
 						Fast
 					</label>
-					<label>
+					<label class="btn btn-default radio-button">
 						<input type="radio" ng-model="speed" ng-change="changeSpeed(speed)" ng-value="10">
 						Super Fast
-					</label>			
+					</label>	
+				</div>					
 				<hr>
-				<input id="fileInput" type="file" value='Open' />
-				
+				<input id="fileInput" type="file" value='Open' />								
 			</div>
 			
 			<script type='text/javascript' src='../Internal Project/js/lib/angular.js'></script>
