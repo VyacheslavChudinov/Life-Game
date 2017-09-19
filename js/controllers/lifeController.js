@@ -4,9 +4,6 @@
 	var lifeApp = angular.module('lifeApp', ['ng-fileDialog']);
 
 	    lifeApp.controller('lifeController', function ($scope, FileDialog) {		
-
-	    $scope.gameIsRunning = false;
-
 	    $scope.fieldWidth = 1000;
 	    $scope.fieldHeight = 1000;
 	    $scope.speed = 2000;
@@ -18,6 +15,8 @@
 	 	$scope.matrixSize = 45;
 
 	 	$scope.map = [];
+
+	 	
 
 	 	function readSingleFile(evt) {
 
@@ -58,8 +57,9 @@
 	    	selectedColor: $scope.selectedColor
 	    });
 
-	 	$scope.clearMap = life.clearMap;
+	    $scope.clearMap = life.clearMap;
 	 	$scope.changeSpeed = life.changeSpeed;
+	 	
 
 	    $scope.downloadMatrix = function downloadMatrix(text, name, type) {
 		    var a = document.createElement("a");
